@@ -193,8 +193,8 @@ colours = init_colours()
 def init_layout_default():
     return {
         "margin": 5,
-        "border_focus": colours[3],
-        "border_normal": colours[2],
+        "border_focus": colours[3], #RoundedCorners(colour = colours[3]),
+        "border_normal": colours[2], #RoundedCorners(colour = colours[2]),
         "border_width": 3
     }
 
