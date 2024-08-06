@@ -18,6 +18,9 @@ otd-daemon &
 # Network manager applet
 nm-applet &
 
+#Authentication
+/usr/libexec/kf6/polkit-kde-authentication-agent-1 &
+
 # Lock screen after 30 minuets of inactivity
 # After another 30 minutes turn of display
 swayidle -w \
