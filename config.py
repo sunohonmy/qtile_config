@@ -64,12 +64,12 @@ keys = [
     # Grow/shrink windows left/right.
     Key([mod], "equal",
         lazy.layout.grow_left().when(layout=["bsp", "columns"]),
-        lazy.layout.grow().when(layout=["monadtall", "monadwide"]),
+        lazy.layout.grow().when(layout=["monadtall", "monadwide", "monadthreecol"]),
         desc="Grow window to the left"
     ),
     Key([mod], "minus",
         lazy.layout.grow_right().when(layout=["bsp", "columns"]),
-        lazy.layout.shrink().when(layout=["monadtall", "monadwide"]),
+        lazy.layout.shrink().when(layout=["monadtall", "monadwide", "monadthreecol"]),
         desc="Grow window to the right"
     ),
 
@@ -134,7 +134,7 @@ for vt in range(1, 8):
 
 
 groups = [
-    Group('1', label='', layout = 'monadtall'),
+    Group('1', label='', layout = 'monadthreecol'),
     Group('2', label='', layout = 'floating'),
     Group('3', label='', layout = 'monadtall'),
     Group('4', label='', layout = 'floating'),
@@ -205,6 +205,13 @@ layouts = [
         **layout_default,
         single_border_width = 4,
     ),
+    layout.MonadThreeCol(
+        **layout_default,
+        single_border_width = 4,
+        new_client_position = "bottom",
+        main_centered = False,
+
+    ),
     layout.Max(
         **layout_default,
     ),
@@ -229,6 +236,9 @@ widget_defaults = dict(
     **extraDecorations,
 )
 extension_defaults = widget_defaults.copy()
+
+def shutdown_computer():
+    qtile.spawn("systemctl poweroff")
 
 screens = [
     Screen(
@@ -293,10 +303,16 @@ screens = [
                     padding = 5,
                 ),
 
-                widget.QuickExit(
+                # widget.QuickExit(
+                #     font = "NotoSans Nerd Font",
+                #     default_text='   ', 
+                #     countdown_format='   {}',
+                # ),
+
+                widget.TextBox(
+                    "   ",
                     font = "NotoSans Nerd Font",
-                    default_text='   ', 
-                    countdown_format='{}',
+                    mouse_callbacks = {"Button1": shutdown_computer},
                 ),
             ],
             36,
@@ -350,7 +366,8 @@ auto_minimize = True
 
 # When using the Wayland backend, this can be used to configure input devices.
 wl_input_rules = {
-    "type:pointer": InputConfig(accel_profile="flat"),
+    #"type:pointer": InputConfig(accel_profile="flat"),
+    "5426:166:Razer Razer Viper V2 Pro": InputConfig(accel_profile="flat"),
     "type:keyboard": InputConfig(kb_layout="gb"),
 }
 
