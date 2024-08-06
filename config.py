@@ -135,14 +135,14 @@ for vt in range(1, 8):
 
 groups = [
     Group('1', label='', layout = 'monadthreecol'),
-    Group('2', label='', layout = 'floating'),
-    Group('3', label='', layout = 'monadtall'),
-    Group('4', label='', layout = 'floating'),
-    Group('5', label='', layout = 'monadtall'),
-    Group('6', label='', layout = 'floating'),
-    Group('7', label='', layout = 'monadtall'),
-    Group('8', label='', layout = 'floating'),
-    Group('9', label='', layout = 'monadtall'),
+    Group('2', label=''),
+    Group('3', label=''),
+    Group('4', label=''),
+    Group('5', label=''),
+    Group('6', label=''),
+    Group('7', label=''),
+    Group('8', label=''),
+    Group('9', label=''),
 ]
 
 # group_names = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
@@ -201,16 +201,15 @@ def init_layout_default():
 layout_default = init_layout_default()
 
 layouts = [
-    layout.MonadTall(
-        **layout_default,
-        single_border_width = 4,
-    ),
     layout.MonadThreeCol(
         **layout_default,
         single_border_width = 4,
         new_client_position = "bottom",
         main_centered = False,
-
+    ),
+    layout.MonadTall(
+        **layout_default,
+        single_border_width = 4,
     ),
     layout.Max(
         **layout_default,
