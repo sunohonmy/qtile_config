@@ -62,14 +62,27 @@ keys = [
     Key([mod, "shift"], "Up", lazy.layout.shuffle_up(), desc="Move window up"),
 
     # Grow/shrink windows left/right.
+    # Main windows
     Key([mod], "equal",
         lazy.layout.grow_left().when(layout=["bsp", "columns"]),
-        lazy.layout.grow().when(layout=["monadtall", "monadwide", "monadthreecol"]),
+        lazy.layout.grow_main().when(layout = ["spiral", "monadtall", "monadwide", "monadthreecol"]),
         desc="Grow window to the left"
     ),
     Key([mod], "minus",
         lazy.layout.grow_right().when(layout=["bsp", "columns"]),
+        lazy.layout.shrink_main().when(layout = ["spiral", "monadtall", "monadwide", "monadthreecol"]),
+        desc="Grow window to the right"
+    ),
+
+    # Secondary windows
+    Key([mod, "shift"], "equal",
+        lazy.layout.grow().when(layout=["monadtall", "monadwide", "monadthreecol"]),
+        lazy.layout.increase_ratio().when(["spiral"]),
+        desc="Grow window to the left"
+    ),
+    Key([mod, "shift"], "minus",
         lazy.layout.shrink().when(layout=["monadtall", "monadwide", "monadthreecol"]),
+        lazy.layout.decrease_ratio().when(["spiral"]),
         desc="Grow window to the right"
     ),
 
@@ -134,7 +147,7 @@ for vt in range(1, 8):
 
 
 groups = [
-    Group('1', label='', layout = 'monadthreecol'),
+    Group('1', label='', layout = 'spiral'),
     Group('2', label=''),
     Group('3', label=''),
     Group('4', label=''),
@@ -207,6 +220,13 @@ layouts = [
         new_client_position = "bottom",
         main_centered = False,
     ),
+    layout.Spiral(
+        **layout_default,
+        new_client_position = "bottom",
+        ratio_increment = 0.01,
+        ratio = 0.5,
+        #main_pain_ratio = 0.5,
+    ),
     layout.MonadTall(
         **layout_default,
         single_border_width = 4,
@@ -217,6 +237,7 @@ layouts = [
     layout.Floating(
         **layout_default,
     ),
+
 ]
 
 extraDecorations = {
