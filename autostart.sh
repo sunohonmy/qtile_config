@@ -21,6 +21,16 @@ nm-applet &
 #Authentication
 /usr/libexec/kf6/polkit-kde-authentication-agent-1 &
 
+# Open Blender in group "2"
+ydotoold &
+
+org.blender.Blender &
+
+#ydotool click 0xC0 &
+#ydotool key 125:1 42:1 3:1 3:0 42:0 125:0 &
+
+# sleep .5 &
+
 # Lock screen after 30 minuets of inactivity
 # After another 30 minutes turn of display
 swayidle -w \

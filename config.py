@@ -147,7 +147,7 @@ for vt in range(1, 8):
 
 
 groups = [
-    Group('1', label='', layout = 'spiral'),
+    Group('1', label='', layout = 'monadthreecol'),
     Group('2', label=''),
     Group('3', label=''),
     Group('4', label=''),
@@ -260,6 +260,9 @@ extension_defaults = widget_defaults.copy()
 def shutdown_computer():
     qtile.spawn("systemctl poweroff")
 
+def close_qtile():
+    lazy.shutdown()
+
 screens = [
     Screen(
         top=bar.Bar(
@@ -332,7 +335,10 @@ screens = [
                 widget.TextBox(
                     "   ",
                     font = "NotoSans Nerd Font",
-                    mouse_callbacks = {"Button1": shutdown_computer},
+                    mouse_callbacks = {
+                        "Button1": shutdown_computer,
+                        "Button3": lazy.shutdown
+                    },
                 ),
             ],
             36,
