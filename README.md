@@ -1,5 +1,10 @@
+# Config
 
+### Old
 ![](Screenshots/2024-08-03_15-08-1722670017.jpg)
 <!--
 ![](Screenshots/2024-08-20_19-08-1724151669.jpg)
 -->
+
+### New
+![](Screenshots/qtileRofiScreenshot.png)
