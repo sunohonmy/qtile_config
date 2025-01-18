@@ -1,13 +1,18 @@
 #!/bin/bash
 
+# Compositor
+picom -b --config ~/.config/picom/picom1.conf &
+
 # Set wallpaper
-swaybg -i  ~/Pictures/the_valley.png -o '*' -m fill >/dev/null 2>&1 &
+#/usr/libexec/xscreensaver/glslideshow -root &
+Rwallpaper &
+#feh --bg-fill "/home/sunohonmy/Pictures/Wallpapers/32_9/Mount Fuji, Japan II.jpg" &
 
 # Set display configuration
-kanshi &
+xrandr --mode 5120x1440 --rate 239.63 &
 
 # Notifications
-mako &
+dunst &
 
 # Bluetooth
 blueman-applet &
@@ -21,20 +26,11 @@ nm-applet &
 #Authentication
 /usr/libexec/kf6/polkit-kde-authentication-agent-1 &
 
-# Open Blender in group "2"
-ydotoold &
+# Blue light filter
+gammastep-indicator &
 
-org.blender.Blender &
-
-#ydotool click 0xC0 &
-#ydotool key 125:1 42:1 3:1 3:0 42:0 125:0 &
-
-# sleep .5 &
+# Screenshot
+flameshot &
 
 # Lock screen after 30 minuets of inactivity
 # After another 30 minutes turn of display
-swayidle -w \
-	timeout 1800 'swaylock -f -c 000000' \
-	timeout 3600 'wlopm --off \*' \
-	resume 'wlopm --on \*' \
-	before-sleep 'swaylock -f -c 000000' &

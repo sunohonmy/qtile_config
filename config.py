@@ -28,19 +28,22 @@ import subprocess
 from libqtile import bar, hook, layout, qtile
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
-from libqtile.backend.wayland import InputConfig
 from qtile_extras import widget
 from qtile_extras.widget.decorations import PowerLineDecoration
-#from qtile_extras.layout.decorations.borders import RoundedCorners
+# from qtile_extras.layout.decorations.borders import RoundedCorners
 
 mod = "mod4"
 altMod = "mod1"
 terminal = "kitty"
 browser = "firefox"
-bemenu = "bemenu-run -b"
-screenshot = 'grim -t jpeg -g "$(slurp)" ~/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%m-%s).jpg'
+rofi = "rofi -show drun -show-icons -theme ~/.config/rofi/druntheme.rasi"
+rofirun = "rofi -show run -show-icons"
+altTab = "rofi -show window -show-icons"
+screenshot = "flameshot gui"
+screenshotFull = "flameshot full"
 
-@hook.subscribe.startup
+
+@hook.subscribe.startup_once
 def autostart_once():
     home = os.path.expanduser('~/.config/qtile/autostart.sh')
     subprocess.call([home])
@@ -53,7 +56,6 @@ keys = [
     Key([mod], "Right", lazy.layout.right(), desc="Move focus to right"),
     Key([mod], "Down", lazy.layout.down(), desc="Move focus down"),
     Key([mod], "Up", lazy.layout.up(), desc="Move focus up"),
-    Key([altMod], "Tab", lazy.layout.next(), desc="Move window focus to other window"),
     # Move windows between left/right columns or move up/down in current stack.
     # Moving out of range in Columns layout will create new column.
     Key([mod, "shift"], "Left", lazy.layout.shuffle_left(), desc="Move window to the left"),
@@ -75,12 +77,12 @@ keys = [
     ),
 
     # Secondary windows
-    Key([mod, "shift"], "equal",
+    Key([mod, "control"], "equal",
         lazy.layout.grow().when(layout=["monadtall", "monadwide", "monadthreecol"]),
         lazy.layout.increase_ratio().when(["spiral"]),
         desc="Grow window to the left"
     ),
-    Key([mod, "shift"], "minus",
+    Key([mod, "control"], "minus",
         lazy.layout.shrink().when(layout=["monadtall", "monadwide", "monadthreecol"]),
         lazy.layout.decrease_ratio().when(["spiral"]),
         desc="Grow window to the right"
@@ -88,11 +90,11 @@ keys = [
 
     # Grow windows. If current window is on the edge of screen and direction
     # will be to screen edge - window would shrink.
-    Key([mod, "control"], "Left", lazy.layout.grow_left(), desc="Grow window to the left"),
-    Key([mod, "control"], "Right", lazy.layout.grow_right(), desc="Grow window to the right"),
-    Key([mod, "control"], "Down", lazy.layout.grow_down(), desc="Grow window down"),
-    Key([mod, "control"], "Up", lazy.layout.grow_up(), desc="Grow window up"),
-    Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
+    # Key([mod, "control"], "Left", lazy.layout.grow_left(), desc="Grow window to the left"),
+    # Key([mod, "control"], "Right", lazy.layout.grow_right(), desc="Grow window to the right"),
+    # Key([mod, "control"], "Down", lazy.layout.grow_down(), desc="Grow window down"),
+    # Key([mod, "control"], "Up", lazy.layout.grow_up(), desc="Grow window up"),
+    # Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
     # Toggle between split and unsplit sides of stack.
     # Split = all windows displayed
     # Unsplit = 1 window displayed, like Max layout, but still with
@@ -105,28 +107,32 @@ keys = [
     ),
     #Spawn terminal
     Key([altMod, "control"], "t", lazy.spawn(terminal), desc="Launch terminal"),
+
     # Toggle between different groups as defined below
-    Key([mod], "Tab", lazy.screen.next_group(), desc="Toggle between groups"),
+    Key([mod, "control"], "Right", lazy.screen.next_group(), desc="Toggle between groups"),
+    Key([mod, "control"], "Left", lazy.screen.prev_group(), desc="Toggle between groups"),
+
     #Toggle between layouts
     Key([mod, "shift"], "Tab", lazy.next_layout(), desc = "Toggle between layouts"),
     #Kill window
     Key([mod], "w", lazy.window.kill(), desc="Kill focused window"),
-    Key(
-        [mod],
-        "f",
-        lazy.window.toggle_fullscreen(),
-        desc="Toggle fullscreen on the focused window",
-    ),
+    Key([mod],"f",lazy.window.toggle_fullscreen(),desc="Toggle fullscreen on the focused window",),
     Key([mod], "t", lazy.window.toggle_floating(), desc="Toggle floating on the focused window"),
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([mod, "shift"], "r", lazy.restart(), desc="Restart Qtile"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
 
     # Custom Keys
-    Key([altMod], "Return", lazy.spawn(bemenu), desc = "Launch bemenu"),
-    Key([mod], "Print", lazy.spawn("sh -c 'grim -t jpeg ~/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%m-%s).jpg'"), desc = "Save fullscreen screenshot as a jpg"),
-    Key([], "Print", lazy.spawn("sh -c 'grim - | wl-copy"), desc = "Copy  fullscreen screenshot to the clipboard"),
-    Key([mod, "shift"], "s", lazy.spawn(f"sh -c '{screenshot}'"), desc = "Take screenshot of selected area and save as a jpg"),
+    # Menu
+    Key([altMod], "Return", lazy.spawn(rofi), desc = "Launch rofi"),
+    Key([altMod, "shift"], "Return", lazy.spawn(rofirun), desc = "Launch rofi"),
+    Key([altMod], "Tab", lazy.spawn(altTab), desc="Alt Tab windows"),    
+
+    # Screenshot
+    Key([mod], "Print", lazy.spawn(screenshotFull), desc = "Copy  fullscreen screenshot to the clipboard"),
+    Key([mod, "shift"], "s", lazy.spawn(screenshot), desc = "Take screenshot of selected area and save as a jpg"),
+
+    # Some random shit
     Key([altMod], "space", 
         lazy.window.move_to_top(),
         desc = "Swith to next window and move that window above all other windows with similar priority" ),
@@ -147,8 +153,8 @@ for vt in range(1, 8):
 
 
 groups = [
-    Group('1', label='', layout = 'monadthreecol'),
-    Group('2', label=''),
+    Group('1', label='', layout = 'spiral'),
+    Group('2', label='', layout = 'spiral'),
     Group('3', label=''),
     Group('4', label=''),
     Group('5', label=''),
@@ -194,11 +200,11 @@ for i in groups:
 
 def init_colours():
     return [
-        ["de97b1"], # colour 0
-        ["AE77AB"], # colour 1
-        ["3A3073"], # colour 2
-        ["3798CD"], # colour 3
-        ["1C1F50"] # colour 4
+        ["999c95"], # colour 0 #de97b1 #999c95
+        ["4c4444"], # colour 1 #AE77AB #262725
+        ["d9dad4"], # colour 2 #3A3073 #d9dad4
+        ["4c4c43"], # colour 3 #3798CD #4c4c43
+        ["262725"] # colour 4 #1C1F50 #4c4444
     ]
 
 colours = init_colours()
@@ -206,9 +212,9 @@ colours = init_colours()
 def init_layout_default():
     return {
         "margin": 5,
-        "border_focus": colours[3], #RoundedCorners(colour = colours[3]),
-        "border_normal": colours[2], #RoundedCorners(colour = colours[2]),
-        "border_width": 3
+        "border_focus": colours[2], #RoundedCorners(colour = colours[2]),
+        "border_normal": colours[3], #RoundedCorners(colour = colours[3]),
+        "border_width": 2
     }
 
 layout_default = init_layout_default()
@@ -216,7 +222,7 @@ layout_default = init_layout_default()
 layouts = [
     layout.MonadThreeCol(
         **layout_default,
-        single_border_width = 4,
+        single_border_width = 2,
         new_client_position = "bottom",
         main_centered = False,
     ),
@@ -227,9 +233,15 @@ layouts = [
         ratio = 0.5,
         #main_pain_ratio = 0.5,
     ),
+    layout.Plasma(
+        **layout_default,
+        border_focus_fixed= colours[2],
+        border_normal_fixed= colours[3],
+        border_width_single = 2,
+    ),
     layout.MonadTall(
         **layout_default,
-        single_border_width = 4,
+        single_border_width = 2,
     ),
     layout.Max(
         **layout_default,
@@ -251,17 +263,15 @@ extraDecorations = {
 
 widget_defaults = dict(
     font="NotoSans Nerd Font",
-    fontsize=13,
-    padding=3,
+    fontsize=14,
+    padding=1,
     **extraDecorations,
 )
 extension_defaults = widget_defaults.copy()
 
-def shutdown_computer():
-    qtile.spawn("systemctl poweroff")
-
-def close_qtile():
-    lazy.shutdown()
+def powerMenu():
+    powermenu = os.path.expanduser('~/.config/rofi/powermenu/powermenu.sh')
+    subprocess.call([powermenu])
 
 screens = [
     Screen(
@@ -281,20 +291,20 @@ screens = [
                     font = "NotoSans Nerd Font",
                     highlight_method='text',
                     disable_drag=True,
-                    this_screen_border = colours[3],
-                    this_current_screen_border = colours[3],
+                    this_screen_border = "3798CD",
+                    this_current_screen_border = "3798CD",
                     urgent_alert_method = "line",
                     #background = colours[2],
                 ),
 
                 widget.CurrentLayout(
                     font = "NotoSans Nerd Font",
-                    background = colours[1],
+                    background = "262725",
                 ),
 
                 widget.WindowName(
                     font = "NotoSans Nerd Font",
-                    max_chars = 50,
+                    #max_chars = 50,
                     #background = colours[2],
 
                 ),
@@ -303,49 +313,71 @@ screens = [
                     #background = colours[1],
                 ),
 
-                widget.Memory(
+                widget.PulseVolume(),
+
+                widget.CPU(
                     font = "NotoSans Nerd Font",
-                    format = "{MemUsed: .0f}{mm} ({MemPercent:.0f}%)",
-                    background = colours[2],
+                    format = " {load_percent}% ",
+                    background = "26272590",
                 ),
 
-                widget.UPowerWidget(
+                widget.NvidiaSensors(
                     font = "NotoSans Nerd Font",
-                    background = colours[1],
+                    format = "{perf}",
+                    background = "26272590",
+                    ),
+
+                widget.Memory(
+                    font = "NotoSans Nerd Font",
+                    format = "{MemUsed: .0f}{mm} ({MemPercent:.0f}%) ",
+                    background = "26272590",
                 ),
+
+                # widget.UPowerWidget(
+                #     font = "NotoSans Nerd Font",
+                #     background = colours[1],
+                # ),
+
+                #widget.Sep(),
 
                 widget.Clock(
                     font = "NotoSans Nerd Font",
-                    format="%a, %d %b %y | %H:%M %Z",
-                    background = colours[2],
+                    format="%a, %d %b %y  %H:%M %Z  ",
+                    background = "26272590",
                 ),
+
+                #widget.Sep(),
                 
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
                 widget.StatusNotifier(
-                    background = colours[1],
-                    padding = 5,
+                    background = "26272590",
+                    padding= 10,
                 ),
 
                 # widget.QuickExit(
                 #     font = "NotoSans Nerd Font",
-                #     default_text='   ', 
+                #     default_text=' ', 
                 #     countdown_format='   {}',
                 # ),
 
                 widget.TextBox(
-                    "   ",
+                    " ",
                     font = "NotoSans Nerd Font",
                     mouse_callbacks = {
-                        "Button1": shutdown_computer,
-                        "Button3": lazy.shutdown
+                        "Button1": powerMenu,
                     },
                 ),
+
+                # widget.Wallpaper(
+                #     directory = "~/Pictures/Wallpapers/32_9/",
+                #     random_selection = True,
+                # ),
             ],
-            36,
-            #border_width = 4,
-            #border_color = "#fff",
-            margin = [6, 75, 3, 75],
-            background = colours[4],
+            28,
+            border_width = 1,
+            border_color = "#fff",
+            margin = [5, 1500, 0, 1500],
+            background = "26272580",
         ),
         #wallpaper = "/home/sunohonmy/Pictures/solo_leveling_ep_12_1.jpg",
         #wallpaper_mode = "fill",
@@ -366,8 +398,8 @@ bring_front_click = False
 floats_kept_above = True
 cursor_warp = False
 floating_layout = layout.Floating(
-    border_focus = colours[3],
-    border_normal = colours[2],
+    border_focus = colours[2],
+    border_normal = colours[3],
     border_width = 4,
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
@@ -377,13 +409,16 @@ floating_layout = layout.Floating(
         Match(wm_class="maketag"),  # gitk
         Match(wm_class="ssh-askpass"),  # ssh-askpass
         Match(wm_class="pavucontrol"),
+        Match(wm_class="steam"),
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
+        Match(title="Render Settings"),
+        Match(title="Playblast Options"),
     ]
 )
 auto_fullscreen = True
 focus_on_window_activation = "smart"
-follow_mouse_focus = False
+follow_mouse_focus = True
 reconfigure_screens = True
 
 # If things like steam games want to auto-minimize themselves when losing
@@ -391,14 +426,10 @@ reconfigure_screens = True
 auto_minimize = True
 
 # When using the Wayland backend, this can be used to configure input devices.
-wl_input_rules = {
-    #"type:pointer": InputConfig(accel_profile="flat"),
-    "5426:166:Razer Razer Viper V2 Pro": InputConfig(accel_profile="flat"),
-    "type:keyboard": InputConfig(kb_layout="gb"),
-}
+wl_input_rules = None
 
 # xcursor theme (string or None) and size (integer) for Wayland backend
-wl_xcursor_theme = "breeze_cursors"
+wl_xcursor_theme = "Dracula"
 wl_xcursor_size = 24
 
 
